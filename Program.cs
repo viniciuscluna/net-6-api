@@ -1,11 +1,31 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using microservice.Context;
+using microservice.Dto;
+using microservice.Infrastructure.Implementation;
+using microservice.Infrastructure.Interfaces;
+using microservice.Mapper;
+using microservice.Validation;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddFluentValidation();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile<DefaultMapper>();
+});
+builder.Services.AddSingleton<IValidator<CarDto>, CarValidator>();
+
+builder.Services.AddTransient<ICarRepository, CarRepository>();
+
+builder.Services.AddDbContext<TeslaContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
