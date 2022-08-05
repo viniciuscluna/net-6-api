@@ -17,6 +17,7 @@ builder.Services.AddControllers().AddFluentValidation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddAutoMapper(config =>
 {
     config.AddProfile<DefaultMapper>();
@@ -25,7 +26,17 @@ builder.Services.AddSingleton<IValidator<CarDto>, CarValidator>();
 
 builder.Services.AddTransient<ICarRepository, CarRepository>();
 
+builder.Services.AddSingleton<ICharacterService, CharacterService>();
+
 builder.Services.AddDbContext<TeslaContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHttpClient("Harry", c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["Endpoints:Harry"]);
+    c.DefaultRequestHeaders.Add("test", "ok");
+});
+
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
